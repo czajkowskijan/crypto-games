@@ -39,6 +39,25 @@ class PRF(Game):
             fun = prf(n)
             self.pi = fun.eval
 
+class PRG(Game):
+    """Security game for PRGs"""
+    oracle = False
+    n = 1
+    l = 2
+
+    def __init__(self, n, l, prg):
+        self.n = n
+        self.l = l
+        self.bit = random.choice([True, False])
+        if self.bit == False:
+            randstring = ''.join(random.choice('01') for i in range(self.l))
+            self.pi = randstring
+        else:
+            seed = ''.join(random.choice('01') for i in range(self.n))
+            gens = prg.eval(seed)
+            self.pi = gens
+        
+
 class Primitive():
     """A general class for functions, encryption subroutines, etc."""
     inlen = 1
@@ -80,7 +99,19 @@ class XorFun(Primitive):
     def describe(self):
         return "F_k(x):= k XOR x"
 
+class ConcG(Primitive):
+    """docstring for XorFun"""
 
+    def __init__(self, n, l):
+        self.inlen = n
+        self.outlen = l
+
+    def eval(self, s):
+        if validInput(s, self.inlen):
+            return ''.join( (s,s) )
+
+    def describe(self):
+        return "G(s):= s || s"
 
 def stIsBin(string):
     for character in string:
